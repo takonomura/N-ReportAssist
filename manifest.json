@@ -29,5 +29,6 @@
     ],
     "permissions": [
         "https://secure.nnn.ed.jp/mypage/*"
-    ]
+    ],
+    "update_url": "https://takonomura.github.io/N-ReportAssist/updates.xml"
 }
