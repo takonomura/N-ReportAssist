@@ -210,7 +210,6 @@ function updateColors(current) {
     let reportElements = getReportElements(subjectElement);
     for (let reportIndex = 0; reportIndex < reportElements.length; reportIndex++) {
       let reportElement = reportElements[reportIndex];
-      let reportName = getName(reportElement);
       let reportDeadline = getReportDeadline(subjectName, reportIndex);
       let reportCompleted = isReportCompleted(reportElement) || reportDeadline > current;
       if (reportCompleted) {
