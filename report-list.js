@@ -1,5 +1,10 @@
 'use strict';
 
+const MESSAGES = {
+  openAllButton: '全て開く',
+  openNearDeadlineButton: '期限が近いものを開く',
+};
+
 const DEADLINE_NAMES = ['5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
 
 /**
@@ -166,11 +171,11 @@ function createButton(text) {
  * Show buttons to open subjects.
  */
 function showOpenButtons() {
-  let openAllButton = createButton('全て開く');
+  let openAllButton = createButton(MESSAGES.openAllButton);
   openAllButton.addEventListener('click', openAll);
   addControlElement(openAllButton);
 
-  let openNearDeadlineButton = createButton('期限が近いものを開く');
+  let openNearDeadlineButton = createButton(MESSAGES.openNearDeadlineButton);
   openNearDeadlineButton.addEventListener('click', openNearDeadline);
   addControlElement(openNearDeadlineButton);
 }
