@@ -1,30 +1,14 @@
 {
     "manifest_version": 2,
     "name": "N-ReportAssist",
-    "version": "1.0.0",
-    "description": "for secure.nnn.ed.jp/mypage",
+    "version": "2.0.0",
+    "description": "for secure.nnn.ed.jp/mypage and nnn.ed.nico",
     "author": "takonomura",
     "content_scripts": [
         {
-            "matches": [
-                "https://secure.nnn.ed.jp/mypage/report/pc/list/",
-                "https://secure.nnn.ed.jp/mypage/report/pc/list/?*",
-                "https://secure.nnn.ed.jp/mypage/report/pc/list/index",
-                "https://secure.nnn.ed.jp/mypage/report/pc/list/index?*",
-                "https://secure.nnn.ed.jp/mypage/result/pc/list/",
-                "https://secure.nnn.ed.jp/mypage/result/pc/list/?*",
-                "https://secure.nnn.ed.jp/mypage/result/pc/list/index",
-                "https://secure.nnn.ed.jp/mypage/result/pc/list/index?*"
-            ],
-            "css": ["report-list.css"],
-            "js": ["report-list.js"]
-        },
-        {
-            "matches": [
-                "https://secure.nnn.ed.jp/mypage/report/pc/list/unit?*",
-                "https://secure.nnn.ed.jp/mypage/result/pc/list/unit?*"
-            ],
-            "js": ["unit-list.js"]
+            "matches": ["https://secure.nnn.ed.jp/mypage/result/pc/list*"],
+            "js": ["result.js"],
+            "css": ["result.css"]
         }
     ],
     "permissions": [

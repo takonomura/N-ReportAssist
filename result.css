@@ -1,0 +1,11 @@
+.n-report-assist-complete {
+  background-color: #ccff99;
+}
+
+.n-report-assist-ended {
+  background-color: #ff9999;
+}
+
+.n-report-assist-current {
+  background-color: #ffff99;
+}
