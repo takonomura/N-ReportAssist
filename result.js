@@ -109,4 +109,47 @@ function updateColors(result) {
   }
 }
 
-updateColors(getResult());
+function getRemainDays(deadline) {
+  const today = new Date();
+
+  const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const deadlineUTC = Date.UTC(today.getFullYear(), deadline.month - 1, deadline.date);
+
+  return Math.floor((deadlineUTC - todayUTC) / (1000 * 60 * 60 * 24));
+}
+
+function showAdditionalInfo(result) {
+  let currentReports = 0;
+  let currentProgress = 0;
+  let nextDeadline;
+  let overdueReports = 0;
+
+  result.forEach(subject => subject.reports.forEach(report => {
+    const state = getState(report.deadline);
+    if (state === 'current') {
+      currentReports++;
+      currentProgress += report.progress;
+      nextDeadline = report.deadline;
+    }
+    if (state === 'ended' && report.progress != 100) {
+      overdueReports++;
+    }
+  }));
+
+  const lines = [
+    `次の提出期日まで: ${getRemainDays(nextDeadline)} 日間`,
+    `今月のレポート: ${currentReports} 個`,
+    `今月の進捗率: ${(currentProgress/currentReports).toFixed(2)} %`,
+    `期日を過ぎたレポート: ${overdueReports} 個`,
+  ];
+
+  const textElement = document.createElement('pre');
+  textElement.textContent = lines.join('\n');
+
+  const nextElement = document.getElementById('result_table');
+  nextElement.parentNode.insertBefore(textElement, nextElement);
+}
+
+const result = getResult();
+updateColors(result);
+showAdditionalInfo(result);
