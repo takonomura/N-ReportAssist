@@ -9,6 +9,10 @@
             "matches": ["https://secure.nnn.ed.jp/mypage/result/pc/list*"],
             "js": ["result.js"],
             "css": ["result.css"]
+        },
+        {
+            "matches": ["https://www.nnn.ed.nico/courses/*/chapters/*"],
+            "js": ["chapter.js"]
         }
     ],
     "permissions": [
