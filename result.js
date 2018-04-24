@@ -120,6 +120,7 @@ function getRemainDays(deadline) {
 
 function showAdditionalInfo(result) {
   let currentReports = 0;
+  let currentFinishedReports = 0;
   let currentProgress = 0;
   let nextDeadline;
   let overdueReports = 0;
@@ -128,6 +129,9 @@ function showAdditionalInfo(result) {
     const state = getState(report.deadline);
     if (state === 'current') {
       currentReports++;
+      if (report.progress === 100) {
+        currentFinishedReports++;
+      }
       currentProgress += report.progress;
       nextDeadline = report.deadline;
     }
@@ -138,7 +142,7 @@ function showAdditionalInfo(result) {
 
   const lines = [
     `次の提出期日まで: ${getRemainDays(nextDeadline)} 日間`,
-    `今月のレポート: ${currentReports} 個`,
+    `今月のレポート: ${currentReports} 個 (${currentFinishedReports} 個完了)`,
     `今月の進捗率: ${(currentProgress/currentReports).toFixed(2)} %`,
     `期日を過ぎたレポート: ${overdueReports} 個`,
   ];
