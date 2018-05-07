@@ -31,8 +31,10 @@ function getResult() {
     const columns = Array.from(row.getElementsByTagName('td'));
 
     if (rowIndex % 3 === 0) {
+      const nameElement = columns.shift();
       currentSubject = {
-        name: getText(columns.shift()),
+        name: getText(nameElement),
+        nameElement: nameElement,
         credits: getNumber(columns.shift()),
         reports: [],
       };
@@ -154,6 +156,48 @@ function showAdditionalInfo(result) {
   nextElement.parentNode.insertBefore(textElement, nextElement);
 }
 
+function setLink(element, href) {
+  const linkElement = document.createElement('a');
+  linkElement.href = href;
+  while (element.hasChildNodes()) {
+    linkElement.appendChild(element.removeChild(element.firstChild));
+  }
+  element.appendChild(linkElement);
+}
+
+function appendLinks(result) {
+  const courses = {
+    '国語表現(東京書籍版)': { id: 365, chapters: [6244, 6245, 6246, 6247, 6248, 6249, 6250, 6251, 6252] },
+    '現代文Ａ(東京書籍版)': { id: 368, chapters: [6253, 6254, 6255, 6256, 6257, 6258] },
+    '地理Ｂ(東京書籍版)': { id: 383, chapters: [6301, 6302, 6303, 6304, 6305, 6306, 6307, 6308, 6309, 6310, 6311, 6312] },
+    '倫理(東京書籍版)': { id: 389, chapters: [6319, 6320, 6321, 6322, 6323, 6324] },
+    '数学Ａ(東京書籍版)': { id: 401, chapters: [6352, 6353, 6354, 6355, 6356, 6357] },
+    '生物基礎(東京書籍版)': { id: 416, chapters: [6382, 6383, 6384, 6385, 6386, 6387] },
+    '体育Ⅱ(東京書籍版)': { id: 425, chapters: [6396, 6397, 6398] },
+    '保健(東京書籍版)': { id: 431, chapters: [6401, 6402, 6403, 6404, 6405, 6406] },
+    '英語会話(東京書籍版)': { id: 446, chapters: [6440, 6441, 6442, 6443, 6444, 6445] },
+    '社会と情報(東京書籍版)': { id: 455, chapters: [6458, 6459, 6460, 6461] },
+    '総合的な学習Ⅱ(東京書籍版)': { id: 464, chapters: [6467] },
+  };
+  result.forEach(subject => {
+    const course = courses[subject.name];
+    if (!course) {
+      console.warn(`No course data for "${subject.name}"`);
+      return;
+    }
+    setLink(subject.nameElement, `https://www.nnn.ed.nico/courses/${course.id}/chapters`);
+    subject.reports.forEach((report, i) => {
+      const chapter = course.chapters[i]
+      if (!chapter) {
+        console.warn(`No chapter data for report "${subject.name}" #${i}`);
+        return;
+      }
+      setLink(report.progressElement, `https://www.nnn.ed.nico/courses/${course.id}/chapters/${chapter}`);
+    });
+  });
+}
+
 const result = getResult();
 updateColors(result);
 showAdditionalInfo(result);
+appendLinks(result);
