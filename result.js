@@ -90,7 +90,7 @@ function getState(deadline) {
     }
     return 'current';
   }
-  if (deadlineMonth === (currentMonth + 1) && deadlineDate <= currentDate) {
+  if (deadlineMonth === (currentMonth + 1) && deadlineDate < currentDate) {
     return 'current';
   }
   return 'future';
