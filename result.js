@@ -1,5 +1,5 @@
 function getNumber(v) {
-  return Number(getText(v).replace(/[^0-9]/, ''));
+  return Number(getText(v).replace(/[^0-9]/g, ''));
 }
 
 function getText(v) {
@@ -9,15 +9,19 @@ function getText(v) {
   return v.trim();
 }
 
-function parseDeadline(s) {
-  const parts = s.split('/');
-  return {
-    month: getNumber(parts[0]),
-    date: getNumber(parts[1]),
-  };
+function parseDeadline(year, s) {
+  const [month, date] = s.split('/');
+  return new Date(year, month - 1, date, 23, 59, 59, 999);
+}
+
+function getRemainDays(deadline) {
+  const now = new Date();
+  return Math.floor((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 function getResult() {
+  const year = getNumber(document.querySelector('#studentTermId [selected]'));
+
   const rows = Array.from(document.querySelectorAll('#result_table tr'));
   const subjects = [];
 
@@ -54,7 +58,7 @@ function getResult() {
 
       switch(rowIndex % 3) {
         case 0:
-          report.deadline = parseDeadline(getText(column));
+          report.deadline = parseDeadline(year, getText(column));
           report.deadlineElement = column;
           break;
         case 1:
@@ -71,65 +75,59 @@ function getResult() {
 
     rowIndex++;
   }
-  return subjects;
-}
 
-function getState(deadline) {
-  const today = new Date();
-  const currentMonth = (today.getMonth() + 9) % 12;
-  const currentDate = today.getDate();
-  const deadlineMonth = (deadline.month + 8) % 12;
-  const deadlineDate = deadline.date;
-
-  if (deadlineMonth < currentMonth) {
-    return 'ended';
-  }
-  if (deadlineMonth === currentMonth) {
-    if (deadlineDate < currentDate) {
-      return 'ended';
+  const now = new Date();
+  let nextDeadline = null;
+  subjects.forEach(subject => subject.reports.forEach(report => {
+    if (report.deadline < now) {
+      return;
     }
-    return 'current';
-  }
-  if (deadlineMonth === (currentMonth + 1) && deadlineDate < currentDate) {
-    return 'current';
-  }
-  return 'future';
+    if (nextDeadline == null || report.deadline < nextDeadline) {
+      nextDeadline = report.deadline;
+    }
+  }));
+
+  subjects.forEach(subject => subject.reports.forEach(report => {
+    if (nextDeadline != null && report.deadline.getTime() == nextDeadline.getTime()) {
+      report.state = 'current';
+      return;
+    }
+    if (report.progress === 100) {
+      report.state = 'completed';
+      return;
+    }
+    if (report.deadline < now) {
+      report.state = 'overdue';
+      return;
+    }
+    report.state = 'future';
+  }));
+
+  return subjects;
 }
 
 function updateColors(result) {
   for (const subject of result) {
     for (const report of subject.reports) {
+      let state = report.state;
       if (report.progress === 100) {
-        report.deadlineElement.classList.add('n-report-assist-complete');
-        report.progressElement.classList.add('n-report-assist-complete');
-        continue;
+        state = 'completed';
       }
-      const state = getState(report.deadline);
       report.deadlineElement.classList.add(`n-report-assist-${state}`);
       report.progressElement.classList.add(`n-report-assist-${state}`);
     }
   }
 }
 
-function getRemainDays(deadline) {
-  const today = new Date();
-
-  const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
-  const deadlineUTC = Date.UTC(today.getFullYear(), deadline.month - 1, deadline.date);
-
-  return Math.floor((deadlineUTC - todayUTC) / (1000 * 60 * 60 * 24));
-}
-
 function showAdditionalInfo(result) {
   let currentReports = 0;
   let currentFinishedReports = 0;
   let currentProgress = 0;
-  let nextDeadline;
+  let nextDeadline = null;
   let overdueReports = 0;
 
   result.forEach(subject => subject.reports.forEach(report => {
-    const state = getState(report.deadline);
-    if (state === 'current') {
+    if (report.state === 'current') {
       currentReports++;
       if (report.progress === 100) {
         currentFinishedReports++;
@@ -137,17 +135,19 @@ function showAdditionalInfo(result) {
       currentProgress += report.progress;
       nextDeadline = report.deadline;
     }
-    if (state === 'ended' && report.progress != 100) {
+    if (report.state === 'overdue') {
       overdueReports++;
     }
   }));
 
-  const lines = [
-    `次の提出期日まで: ${getRemainDays(nextDeadline)} 日間`,
-    `今月のレポート: ${currentReports} 個 (${currentFinishedReports} 個完了)`,
-    `今月の進捗率: ${(currentProgress/currentReports).toFixed(2)} %`,
-    `期日を過ぎたレポート: ${overdueReports} 個`,
-  ];
+  const lines = [];
+
+  if (nextDeadline != null ) {
+    lines.push(`次の提出期日まで: ${getRemainDays(nextDeadline)} 日間`);
+    lines.push(`今月のレポート: ${currentReports} 個 (${currentFinishedReports} 個完了)`);
+    lines.push(`今月の進捗率: ${(currentProgress/currentReports).toFixed(2)} %`);
+  }
+  lines.push(`期日を過ぎたレポート: ${overdueReports} 個`);
 
   const textElement = document.createElement('pre');
   textElement.textContent = lines.join('\n');
