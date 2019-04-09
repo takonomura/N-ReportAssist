@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "N-ReportAssist",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "for secure.nnn.ed.jp/mypage and nnn.ed.nico",
     "author": "takonomura",
     "content_scripts": [
